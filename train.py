@@ -42,7 +42,8 @@ import time
 import os
 import sys
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from tensorflow import keras
 from tensorflow.keras.optimizers import Adam
 
@@ -69,7 +70,7 @@ def parse_args(args):
     occlusion_parser = subparsers.add_parser('occlusion')
     occlusion_parser.add_argument('occlusion_path', help = 'Path to dataset directory (ie. /Datasets/Linemod_preprocessed/).')
 
-    parser.add_argument('--rotation-representation', help = 'Which representation of the rotation should be used. Choose from "axis_angle", "rotation_matrix" and "quaternion"', default = 'axis_angle')    
+    parser.add_argument('--rotation-representation', help = 'Which representation of the rotation should be used. Choose from "axis_angle", "rotation_matrix" and "quaternion"', default = 'axis_angle')
 
     parser.add_argument('--weights', help = 'File containing weights to init the model parameter')
     parser.add_argument('--freeze-backbone', help = 'Freeze training of backbone layers.', action = 'store_true')
@@ -201,7 +202,7 @@ def allow_gpu_growth_memory():
         Set allow growth GPU memory to true
 
     """
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
     _ = tf.Session(config = config)
 
@@ -315,51 +316,71 @@ def create_generators(args):
         'batch_size': args.batch_size,
         'phi': args.phi,
     }
+    from generators.custom import CustomGenerator
+    train_generator = CustomGenerator(
+        args.linemod_path,
+        args.object_id,
+        rotation_representation=args.rotation_representation,
+        use_colorspace_augmentation=not args.no_color_augmentation,
+        use_6DoF_augmentation=not args.no_6dof_augmentation,
+        **common_args
+    )
 
-    if args.dataset_type == 'linemod':
-        from generators.linemod import LineModGenerator
-        train_generator = LineModGenerator(
-            args.linemod_path,
-            args.object_id,
-            rotation_representation = args.rotation_representation,
-            use_colorspace_augmentation = not args.no_color_augmentation,
-            use_6DoF_augmentation = not args.no_6dof_augmentation,
-            **common_args
-        )
-
-        validation_generator = LineModGenerator(
-            args.linemod_path,
-            args.object_id,
-            train = False,
-            shuffle_dataset = False,
-            shuffle_groups = False,
-            rotation_representation = args.rotation_representation,
-            use_colorspace_augmentation = False,
-            use_6DoF_augmentation = False,
-            **common_args
-        )
-    elif args.dataset_type == 'occlusion':
-        from generators.occlusion import OcclusionGenerator
-        train_generator = OcclusionGenerator(
-            args.occlusion_path,
-            rotation_representation = args.rotation_representation,
-            use_colorspace_augmentation = not args.no_color_augmentation,
-            use_6DoF_augmentation = not args.no_6dof_augmentation,
-            **common_args
-        )
-
-        validation_generator = OcclusionGenerator(
-            args.occlusion_path,
-            train = False,
-            shuffle_dataset = False,
-            shuffle_groups = False,
-            rotation_representation = args.rotation_representation,
-            use_colorspace_augmentation = False,
-            use_6DoF_augmentation = False,
-            **common_args
-        )
-    else:
-        raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
+    validation_generator = CustomGenerator(
+        args.linemod_path,
+        args.object_id,
+        train=False,
+        shuffle_dataset=False,
+        shuffle_groups=False,
+        rotation_representation=args.rotation_representation,
+        use_colorspace_augmentation=False,
+        use_6DoF_augmentation=False,
+        **common_args
+    )
+    # if args.dataset_type == 'linemod':
+    #     from generators.linemod import LineModGenerator
+    #     train_generator = LineModGenerator(
+    #         args.linemod_path,
+    #         args.object_id,
+    #         rotation_representation = args.rotation_representation,
+    #         use_colorspace_augmentation = not args.no_color_augmentation,
+    #         use_6DoF_augmentation = not args.no_6dof_augmentation,
+    #         **common_args
+    #     )
+    #
+    #     validation_generator = LineModGenerator(
+    #         args.linemod_path,
+    #         args.object_id,
+    #         train = False,
+    #         shuffle_dataset = False,
+    #         shuffle_groups = False,
+    #         rotation_representation = args.rotation_representation,
+    #         use_colorspace_augmentation = False,
+    #         use_6DoF_augmentation = False,
+    #         **common_args
+    #     )
+    # elif args.dataset_type == 'occlusion':
+    #     from generators.occlusion import OcclusionGenerator
+    #     train_generator = OcclusionGenerator(
+    #         args.occlusion_path,
+    #         rotation_representation = args.rotation_representation,
+    #         use_colorspace_augmentation = not args.no_color_augmentation,
+    #         use_6DoF_augmentation = not args.no_6dof_augmentation,
+    #         **common_args
+    #     )
+    #
+    #     validation_generator = OcclusionGenerator(
+    #         args.occlusion_path,
+    #         train = False,
+    #         shuffle_dataset = False,
+    #         shuffle_groups = False,
+    #         rotation_representation = args.rotation_representation,
+    #         use_colorspace_augmentation = False,
+    #         use_6DoF_augmentation = False,
+    #         **common_args
+    #     )
+    # else:
+    #     raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
 
     return train_generator, validation_generator
 
