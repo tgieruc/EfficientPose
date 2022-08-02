@@ -429,7 +429,8 @@ class CustomGenerator(Generator):
             #class label is always zero because there is only one possible object
             #get bbox from mask
             mask = cv2.imread(mask_path)
-            annotations["bboxes"][0, :], _ = self.get_bbox_from_mask(mask)
+            # annotations["bboxes"][0, :], _ = self.get_bbox_from_mask(mask)
+            annotations["bboxes"][0, :]= np.array(gt["obj_bb"], dtype=np.float32)
             #transform rotation into the needed representation
             annotations["rotations"][0, :-2] = self.transform_rotation(np.array(gt["cam_R_m2c"]), self.rotation_representation)
             annotations["rotations"][0, -2] = float(self.is_symmetric_object(self.object_id))
@@ -578,8 +579,8 @@ class CustomGenerator(Generator):
 
 if __name__ == "__main__":
     #test linemod generator
-    train_gen = CustomGenerator("../data/linemod_preprocessed/", object_id = 17, rotation_representation="rotation_matrix")
-    test_gen = CustomGenerator("../data/linemod_preprocessed/", object_id = 17, train = False, rotation_representation="rotation_matrix")
+    train_gen = CustomGenerator("../linemod/", object_id = 17)
+    test_gen = CustomGenerator("../linemod/", object_id = 17, train = False)
     
     img, anno = train_gen[0]
     
