@@ -13,7 +13,7 @@ or at http://creativecommons.org/licenses/by-nc/4.0/.
 ---------------------------------------------------------------------------------------------------------------------------------
 
 Based on:
-    
+
 Copyright 2018 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-    
+
 """
 
 import h5py
@@ -41,13 +41,13 @@ def custom_load_weights(filepath, layers, skip_mismatch):
         filepath: Path to the weights file
         layers: List of layers for which to load weights
         skip_mismatch: Boolean indicating if weights loading should be skipped for a layer if the shape from the layer in the list and weight file does not match
-    
+
     """
     with h5py.File(filepath, 'r') as f:
         if 'layer_names' not in f.attrs and 'model_weights' in f:
             f = f['model_weights']
         load_weights_from_hdf5_group_by_name(f, layers, skip_mismatch = skip_mismatch)
-        
+
 
 #copied and adapted from https://github.com/tensorflow/tensorflow/blob/v2.1.0/tensorflow/python/keras/saving/hdf5_format.py
 def load_weights_from_hdf5_group_by_name(
@@ -66,12 +66,12 @@ def load_weights_from_hdf5_group_by_name(
           and weights file and skip_match=False.
   """
   if 'keras_version' in f.attrs:
-    original_keras_version = f.attrs['keras_version'].decode('utf8')
+    original_keras_version = f.attrs['keras_version']
     # original_keras_version = f.attrs['keras_version']
   else:
     original_keras_version = '1'
   if 'backend' in f.attrs:
-    original_backend = f.attrs['backend'].decode('utf8')
+    original_backend = f.attrs['backend']
     # original_backend = f.attrs['backend']
   else:
     original_backend = None
@@ -84,7 +84,7 @@ def load_weights_from_hdf5_group_by_name(
   for layer in layers:
     if layer.name:
       index.setdefault(layer.name, []).append(layer)
-      
+
 
   # We batch weight value assignments in a single backend call
   # which provides a speedup in TensorFlow.
@@ -93,7 +93,7 @@ def load_weights_from_hdf5_group_by_name(
     g = f[name]
     weight_names = load_attributes_from_hdf5_group(g, 'weight_names')
     weight_values = [np.asarray(g[weight_name]) for weight_name in weight_names]
-    
+
     if not name in index:
         print("\n\nWARNING: Layer {} could not be found!".format(name))
 
@@ -132,8 +132,8 @@ def load_weights_from_hdf5_group_by_name(
         else:
           weight_value_tuples.append((symbolic_weights[i], weight_values[i]))
   K.batch_set_value(weight_value_tuples)
-  
-  
+
+
 def load_attributes_from_hdf5_group(group, name):
   """Loads attributes of the specified name from the HDF5 group.
   This method deals with an inherent problem
