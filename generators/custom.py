@@ -348,7 +348,7 @@ class CustomGenerator(Generator):
         all_images_path = os.path.join(object_path, "rgb")
         
         #load all images which are in the dataset split (train/test)
-        all_filenames = [filename for filename in os.listdir(all_images_path) if self.image_extension in filename and filename.replace(self.image_extension, "") in data_examples]
+        all_filenames = [filename for filename in sorted(os.listdir(all_images_path)) if self.image_extension in filename and filename.replace(self.image_extension, "") in data_examples]
         image_paths = [os.path.join(all_images_path, filename) for filename in all_filenames]
         mask_paths = [img_path.replace("rgb", "mask") for img_path in image_paths]
         depth_paths = [img_path.replace("rgb", "depth") for img_path in image_paths]
