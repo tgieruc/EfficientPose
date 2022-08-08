@@ -248,8 +248,8 @@ def create_callbacks(training_model, prediction_model, validation_generator, arg
         if args.tensorboard_dir:
             tensorboard_dir = os.path.join(args.tensorboard_dir, "occlusion")
             
-        metric_to_monitor = "ADD(-S)"
-        mode = "max"
+        metric_to_monitor = "loss"
+        mode = "min"
     else:
         snapshot_path = args.snapshot_path
         save_path = args.validation_image_save_path
@@ -281,12 +281,12 @@ def create_callbacks(training_model, prediction_model, validation_generator, arg
     if args.snapshots:
         # ensure directory created first; otherwise h5py will error after epoch.
         os.makedirs(snapshot_path, exist_ok = True)
-        checkpoint = keras.callbacks.ModelCheckpoint(os.path.join(snapshot_path, 'phi_{phi}_{dataset_type}_best_{metric}.h5'.format(phi = str(args.phi), metric = metric_to_monitor, dataset_type = args.dataset_type)),
+        checkpoint = keras.callbacks.ModelCheckpoint(os.path.join(snapshot_path, 'Drive/MyDrive/Stage/phi_{phi}_{dataset_type}_best_{metric}_epoch.h5'.format(phi = str(args.phi), metric = metric_to_monitor, dataset_type = args.dataset_type)),
                                                      verbose = 1,
                                                      #save_weights_only = True,
-                                                     save_best_only = True,
+                                                     save_best_only = False,
                                                      monitor = metric_to_monitor,
-                                                     mode = mode)
+                                                     )
         callbacks.append(checkpoint)
 
     callbacks.append(keras.callbacks.ReduceLROnPlateau(
