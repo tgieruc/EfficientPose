@@ -146,14 +146,14 @@ def load_attributes_from_hdf5_group(group, name):
       data: Attributes data.
   """
   if name in group.attrs:
-    data = [n.decode('utf8') for n in group.attrs[name]]
+    data = [n for n in group.attrs[name]]
     # data = [n for n in group.attrs[name]]
   else:
     data = []
     chunk_id = 0
     while '%s%d' % (name, chunk_id) in group.attrs:
       data.extend(
-           [n.decode('utf8') for n in group.attrs['%s%d' % (name, chunk_id)]])
+           [n for n in group.attrs['%s%d' % (name, chunk_id)]])
           # [n for n in group.attrs['%s%d' % (name, chunk_id)]])
       chunk_id += 1
   return data
