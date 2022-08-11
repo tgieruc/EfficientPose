@@ -139,19 +139,21 @@ def main(args = None):
     print("Done!")
     # load pretrained weights
     if args.weights:
-        if args.weights == 'imagenet':
-            model_name = 'efficientnet-b{}'.format(args.phi)
-            file_name = '{}_weights_tf_dim_ordering_tf_kernels_autoaugment_notop.h5'.format(model_name)
-            file_hash = WEIGHTS_HASHES[model_name][1]
-            weights_path = keras.utils.get_file(file_name,
-                                                BASE_WEIGHTS_PATH + file_name,
-                                                cache_subdir='models',
-                                                file_hash=file_hash)
-            model.load_weights(weights_path, by_name=True)
-        else:
-            print('Loading model, this may take a second...')
-            custom_load_weights(filepath = args.weights, layers = all_layers, skip_mismatch = True)
-            print("\nDone!")
+        model.load_weights(args.weights, by_name=True)
+        # #
+        # if args.weights == 'imagenet':
+        #     model_name = 'efficientnet-b{}'.format(args.phi)
+        #     file_name = '{}_weights_tf_dim_ordering_tf_kernels_autoaugment_notop.h5'.format(model_name)
+        #     file_hash = WEIGHTS_HASHES[model_name][1]
+        #     weights_path = keras.utils.get_file(file_name,
+        #                                         BASE_WEIGHTS_PATH + file_name,
+        #                                         cache_subdir='models',
+        #                                         file_hash=file_hash)
+        #     model.load_weights(weights_path, by_name=True)
+        # else:
+        #     print('Loading model, this may take a second...')
+        #     custom_load_weights(filepath = args.weights, layers = all_layers, skip_mismatch = True)
+        #     print("\nDone!")
 
     # freeze backbone layers
     if args.freeze_backbone:
@@ -281,7 +283,7 @@ def create_callbacks(training_model, prediction_model, validation_generator, arg
     if args.snapshots:
         # ensure directory created first; otherwise h5py will error after epoch.
         os.makedirs(snapshot_path, exist_ok = True)
-        checkpoint = keras.callbacks.ModelCheckpoint(os.path.join(snapshot_path, 'Drive/MyDrive/Stage/phi_{phi}_{dataset_type}_best_{metric}_epoch.h5'.format(phi = str(args.phi), metric = metric_to_monitor, dataset_type = args.dataset_type)),
+        checkpoint = keras.callbacks.ModelCheckpoint(os.path.join(snapshot_path, 'phi_{phi}_{dataset_type}_best_{metric}_epoch.h5'.format(phi = str(args.phi), metric = metric_to_monitor, dataset_type = args.dataset_type)),
                                                      verbose = 1,
                                                      #save_weights_only = True,
                                                      save_best_only = False,
