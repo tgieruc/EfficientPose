@@ -1,0 +1,13 @@
+efficient_pose/path_to_weights: best.h5
+efficient_pose/score_threshold: 0.5
+efficient_pose/translation_scale_norm: 1000.0
+efficient_pose/draw_bbox_2d: False
+efficient_pose/draw_name: False
+efficient_pose/input: /camera/color/image_raw
+efficient_pose/visualize: True
+efficient_pose/camera_matrix: [606.9854125976562, 0.0, 319.631591796875,
+                               0.0, 605.36376953125, 237.0765838623047,
+                               0.0, 0.0, 1.0]
+efficient_pose/phi: 0
+efficient_pose/class_names: ["quadrotor"]
+efficient_pose/class_3dbox:  [[430, -150, -150, -150, 300, 310, 300]]

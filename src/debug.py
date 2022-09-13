@@ -106,8 +106,8 @@ def create_generator(args):
         shuffle_dataset=False,
         shuffle_groups=False,
         rotation_representation=args.rotation_representation,
-        use_colorspace_augmentation= args.no_color_augmentation,
-        use_6DoF_augmentation= args.no_6dof_augmentation,
+        use_colorspace_augmentation= not args.no_color_augmentation,
+        use_6DoF_augmentation=  not args.no_6dof_augmentation,
         phi=args.phi,
     )
     # if args.dataset_type == 'linemod':

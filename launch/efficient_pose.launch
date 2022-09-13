@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+
+
+    <arg name="ns" default="/" />
+    <group ns="$(arg ns)">
+        <rosparam command="load" file="$(find efficient_pose)/config/efficient_pose.yaml" />
+        <node name="efficient_pose_node" pkg="efficient_pose" type="inference_ros.py" output="screen"/>
+    </group>
+
+</launch>

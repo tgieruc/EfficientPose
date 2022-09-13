@@ -41,7 +41,8 @@ import argparse
 import os
 import sys
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 from model import build_EfficientPose
 from eval.common import evaluate
@@ -149,35 +150,22 @@ def create_generators(args):
         'phi': args.phi,
     }
 
-    if args.dataset_type == 'linemod':
-        from generators.linemod import LineModGenerator
-        
-        generator = LineModGenerator(
-            args.linemod_path,
-            args.object_id,
-            train = False,
-            shuffle_dataset = False,
-            shuffle_groups = False,
-            rotation_representation = args.rotation_representation,
-            use_colorspace_augmentation = False,
-            use_6DoF_augmentation = False,
-            **common_args
-        )
-    elif args.dataset_type == 'occlusion':
-        from generators.occlusion import OcclusionGenerator
-        
-        generator = OcclusionGenerator(
-            args.occlusion_path,
-            train = False,
-            shuffle_dataset = False,
-            shuffle_groups = False,
-            rotation_representation = args.rotation_representation,
-            use_colorspace_augmentation = False,
-            use_6DoF_augmentation = False,
-            **common_args
-        )
-    else:
-        raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
+    common_args = {
+        'batch_size': args.batch_size,
+        'phi': args.phi,
+    }
+    from generators.custom import CustomGenerator
+    generator = CustomGenerator(
+        args.linemod_path,
+        args.object_id,
+        train=False,
+        shuffle_dataset=False,
+        shuffle_groups=False,
+        rotation_representation=args.rotation_representation,
+        use_colorspace_augmentation=False,
+        use_6DoF_augmentation=False,
+        **common_args
+    )
 
     return generator  
 

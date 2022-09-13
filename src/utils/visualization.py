@@ -163,13 +163,13 @@ def draw_detections(image, boxes, scores, labels, rotations, translations, class
         if draw_bbox_2d:
             draw_box(image, boxes[i, :], color = c)
         translation_vector = translations[i, :]
-        points_bbox_2D = project_bbox_3D_to_2D(class_to_bbox_3D[labels[i]], rotations[i, :], translation_vector, camera_matrix, append_centerpoint = True)
+        points_bbox_2D = project_bbox_3D_to_2D(class_to_bbox_3D[0], rotations[i, :], translation_vector, camera_matrix, append_centerpoint = True)
         draw_bbox_8_2D(image, points_bbox_2D, color = c)
         if draw_name:
             if isinstance(label_to_name, dict):
-                name = label_to_name[labels[i]] if label_to_name else labels[i]
+                name = label_to_name[0] if label_to_name else labels[i]
             else:
-                name = label_to_name(labels[i]) if label_to_name else labels[i]
+                name = label_to_name(0) if label_to_name else labels[i]
             caption = name + ': {0:.2f}'.format(scores[i])
             draw_caption(image, boxes[i, :], caption)
 

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>efficient_pose</name>
+  <version>0.0.0</version>
+  <description>A wrapper for efficient_pose</description>
+  <maintainer email="theo.gieruc@epfl.ch">Théo Gieruc</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+  <build_depend>rospy</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>sensor_msg</build_depend>
+
+
+  <run_depend>rospy</run_depend>
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>sensor_msg</run_depend>
+
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

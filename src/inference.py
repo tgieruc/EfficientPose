@@ -29,8 +29,8 @@ import os
 from tqdm import tqdm
 import math
 
-import tensorflow as tf
-
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from model import build_EfficientPose
 from utils import preprocess_image
 from utils.visualization import draw_detections
@@ -45,15 +45,15 @@ def main():
     allow_gpu_growth_memory()
 
     #input parameter
-    path_to_images = "/Datasets/Linemod_preprocessed/data/02/rgb/"
+    path_to_images = "linemod/data/16/rgb"
     image_extension = ".png"
     phi = 0
-    path_to_weights = "./weights/phi_0_occlusion_best_ADD(-S).h5"
-    save_path = "./predictions/occlusion/" #where to save the images or None if the images should be displayed and not saved
+    path_to_weights = "best_no_merge.h5"
+    save_path = "./predictions/16_old_model/" #where to save the images or None if the images should be displayed and not saved
     # save_path = None
-    class_to_name = {0: "ape", 1: "can", 2: "cat", 3: "driller", 4: "duck", 5: "eggbox", 6: "glue", 7: "holepuncher"} #Occlusion
-    #class_to_name = {0: "driller"} #Linemod use a single class with a name of the Linemod objects
-    score_threshold = 0.5
+    # class_to_name = {0: "ape", 1: "can", 2: "cat", 3: "driller", 4: "duck", 5: "eggbox", 6: "glue", 7: "holepuncher", 16:"drone"} #Occlusion
+    class_to_name = {16: "drone"} #Linemod use a single class with a name of the Linemod objects
+    score_threshold = 0.2
     translation_scale_norm = 1000.0
     draw_bbox_2d = False
     draw_name = False
@@ -117,9 +117,9 @@ def allow_gpu_growth_memory():
         Set allow growth GPU memory to true
 
     """
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
-    _ = tf.Session(config = config)
+    _ = tf.compat.v1.Session(config = config)
 
 
 def get_linemod_camera_matrix():
@@ -128,7 +128,8 @@ def get_linemod_camera_matrix():
         The Linemod and Occlusion 3x3 camera matrix
 
     """
-    return np.array([[572.4114, 0., 325.2611], [0., 573.57043, 242.04899], [0., 0., 1.]], dtype = np.float32)
+    return np.array([[606.9854125976562,0.0,  319.631591796875],[ 0.0,605.36376953125, 237.0765838623047],[0,0,1]], dtype = np.float32)
+    # return np.array([[572.4114, 0., 325.2611], [0., 573.57043, 242.04899], [0., 0., 1.]], dtype = np.float32)
 
 
 def get_linemod_3d_bboxes():
@@ -149,7 +150,9 @@ def get_linemod_3d_bboxes():
                             "holepuncher":  {"diameter": 145.54287471, "min_x": -50.44390000, "min_y": -54.24850000, "min_z": -45.40000000, "size_x": 100.88780000, "size_y": 108.49700000, "size_z": 90.80000000},
                             "iron":         {"diameter": 278.07811733, "min_x": -129.11300000, "min_y": -59.24100000, "min_z": -70.56620000, "size_x": 258.22600000, "size_y": 118.48210000, "size_z": 141.13240000},
                             "lamp":         {"diameter": 282.60129399, "min_x": -101.57300000, "min_y": -58.87630000, "min_z": -106.55800000, "size_x": 203.14600000, "size_y": 117.75250000, "size_z": 213.11600000},
-                            "phone":        {"diameter": 212.35825148, "min_x": -46.95910000, "min_y": -73.71670000, "min_z": -92.37370000, "size_x": 93.91810000, "size_y": 147.43340000, "size_z": 184.74740000}}
+                            "phone":        {"diameter": 212.35825148, "min_x": -46.95910000, "min_y": -73.71670000, "min_z": -92.37370000, "size_x": 93.91810000, "size_y": 147.43340000, "size_z": 184.74740000},
+                            "drone": {"diameter": 430, "min_x": -150, "min_y": -150, "min_z": -150, "size_x": 300, "size_y": 310, "size_z": 300}
+}
         
     name_to_3d_bboxes = {name: convert_bbox_3d(model_info) for name, model_info in name_to_model_info.items()}
     
