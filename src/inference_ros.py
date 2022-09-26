@@ -36,6 +36,11 @@ from utils import preprocess_image
 from utils.visualization import draw_detections
 
 import rospy
+# import tf2_ros
+# import tf_conversions
+from scipy.spatial.transform import Rotation as R
+
+import geometry_msgs.msg
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 import unittest.mock as mock
@@ -51,6 +56,8 @@ class EfficientPose(object):
         self.get_params()
 
         self.model, self.image_size = build_model_and_load_weights(self.params)
+
+        self.publisher = rospy.Publisher("efficient_pose/tf", geometry_msgs.msg.TransformStamped)
 
         rospy.Subscriber(self.params.input, Image, self.image_callback, queue_size=1000)
 
@@ -85,6 +92,24 @@ class EfficientPose(object):
             cv2.imshow('image with predictions', self.frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 exit()
+
+        print(0)
+        if translations is not None:
+            for trans, rot in zip(translations, rotations):
+                t = geometry_msgs.msg.TransformStamped()
+                # t.header = rospy.Time.now()
+                # t.child_frame_id = "tf"
+                t.transform.translation.x = trans[0]
+                t.transform.translation.y = trans[1]
+                t.transform.translation.z = trans[2]
+                q = R.from_euler('zyx',rot).as_quat()
+                t.transform.rotation.x = q[0]
+                t.transform.rotation.y = q[1]
+                t.transform.rotation.z = q[2]
+                t.transform.rotation.w = q[3]
+
+                self.publisher.publish(t)
+
 
 
 
